@@ -18,7 +18,7 @@ public class UiTester extends UiAutomatorTestCase {
    * Main method that will execute the test
    * @throws UiObjectNotFoundException
    */
-  public void testPerectButter() throws UiObjectNotFoundException {
+  public void testPerfectButter() throws UiObjectNotFoundException {
     
     UiDevice.getInstance().pressHome();
     
