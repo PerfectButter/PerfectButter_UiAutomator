@@ -2,16 +2,16 @@ PerfectButter_UiAutomator
 =========================
 
 Clone Repo:
-$ git clone git@github.com:PerfectButter/PerfectButter_UiAutomator.git
+<p>$ git clone git@github.com:PerfectButter/PerfectButter_UiAutomator.git
 
 Building and Deploying UiAutomator Test
-$ <android-sdk>/tools/android create uitest-project -n PerfectButterTest -t 24 -p <path>/PerfectButter_UiAutomator
-	example: $ ~/Development/android/tools create uitest-project -n PerfectButterTest -t 24 /Volumes/android/PerfectButter_UiAutomator
+<p>$ <android-sdk>/tools/android create uitest-project -n PerfectButterTest -t 24 -p <path>/PerfectButter_UiAutomator
+<p><b>example: $ ~/Development/android/tools create uitest-project -n PerfectButterTest -t 24 /Volumes/android/PerfectButter_UiAutomator</b>
 
-$ ant build
+<p>$ ant build
 
-$ adb push <path_to_output_jar> /data/local/tmp/
-	example: $ adb push /Volumes/android/PerfectButter_UiAutomator/bin/PerfectButterTest.jar /data/local/tmp
+<p>$ adb push <path_to_output_jar> /data/local/tmp/
+<p><b>example: $ adb push /Volumes/android/PerfectButter_UiAutomator/bin/PerfectButterTest.jar /data/local/tmp</b>
 
-Running UiAutomator Test
-$ adb shell uiautomator runtest PerfectButterTest.jar -c com.perfectbutter.uiautomator.UiTester
+<p>Running UiAutomator Test
+<p>$ adb shell uiautomator runtest PerfectButterTest.jar -c com.perfectbutter.uiautomator.UiTester
