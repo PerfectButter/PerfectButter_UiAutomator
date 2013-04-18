@@ -11,7 +11,7 @@ import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 
 public class UiTester extends UiAutomatorTestCase {
   
-  private static String TAG = "Perfect Butter Ui Automator";
+  private static final String TAG = "Perfect Butter Ui Automator";
   private int numTests = 100;
   
   /**
@@ -39,14 +39,8 @@ public class UiTester extends UiAutomatorTestCase {
   private void goToAboutPhone() throws UiObjectNotFoundException {
     Log.d(TAG, "Going to About Phone to view Project Name");
     
-    Log.d(TAG, "Opening notification shade");
-    openNotificationShade();
-    
-    UiObject quickSettings = new UiObject(new UiSelector().description("Quick settings."));
-    quickSettings.clickAndWaitForNewWindow();
-    
-    UiObject settings = new UiObject(new UiSelector().text("Settings"));
-    settings.clickAndWaitForNewWindow();
+    Log.d(TAG,  "Launching Settings App from Notification shade");
+    PhoneUtilities.goToSettings();
     
     UiScrollable settingsView = new UiScrollable(new UiSelector().scrollable(true));
     
@@ -57,60 +51,51 @@ public class UiTester extends UiAutomatorTestCase {
     
     UiScrollable aboutPhoneView = new UiScrollable(new UiSelector().scrollable(true));
     
+    Log.d(TAG, "Scroll to bottom of screen to show ROM version & Build number");
     aboutPhoneView.scrollToEnd(1);
-    delay(5);
     
+    Log.d(TAG, "Delay to allow demo to view the information about ROM");
+    PhoneUtilities.delay(5);
+    
+    Log.d(TAG, "Press home button to go back to homescreen");
+    UiDevice.getInstance().pressHome();
   }
   
   /**
    * Launch PerfectButterBackup application
    */
-  private static void launchPerfectButter() {
+  private static void launchPerfectButter() throws UiObjectNotFoundException {
     
+    Log.d(TAG, "Launch PerfectButterBackup App");
+    PhoneUtilities.goToAppDrawer();
+        
+    UiScrollable appViews = new UiScrollable(new UiSelector().scrollable(true));
+    appViews.setAsHorizontalList();
+    
+    UiObject perfectButterApp = appViews.getChildByText(new UiSelector()
+    .className(android.widget.TextView.class.getName()), "Perfect Butter Backup");
+    
+    perfectButterApp.clickAndWaitForNewWindow(); 
   }
   
   /**
    * Toggle through Rom Options
    */
-  private static void romOptions() {
+  private static void romOptions() throws UiObjectNotFoundException {
     
   }
   
   /**
    * Toggle Backup Options
    */
-  private static void backup() {
+  private static void backup() throws UiObjectNotFoundException {
     
   }
   
   /**
    * Toggle Restore options
    */
-  private static void restore() {
+  private static void restore() throws UiObjectNotFoundException {
     
-  }
-  
-  /**
-   * Method to open notification shade with swiping motion
-   */
-  private void openNotificationShade() {
-    int deviceWidth = UiDevice.getInstance().getDisplayWidth();
-    int deviceHeight = UiDevice.getInstance().getDisplayHeight();
-    
-    UiDevice.getInstance().swipe(deviceWidth / 2, 0, deviceWidth / 2, deviceHeight, 20); 
-  }
-  
-  /**
-   * Allow to delay new actions from being done.
-   * This is strictly for demo purpose as we would like certain parts to be
-   * viewied for a certain amount of time before proceeding to next method.
-   * @param seconds
-   */
-  private static void delay(int seconds) {
-    try {
-      Thread.sleep(seconds * 1000); //sleep is in milliseconds. convert to seconds
-      } catch (InterruptedException ie) {
-      ie.printStackTrace();
-    }
   }
 }
