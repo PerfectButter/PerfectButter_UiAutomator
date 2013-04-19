@@ -1,5 +1,6 @@
 package com.perfectbutter.uiautomator;
 
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.android.uiautomator.core.UiDevice;
@@ -17,20 +18,21 @@ public class UiTester extends UiAutomatorTestCase {
   /**
    * Main method that will execute the test
    * @throws UiObjectNotFoundException
+   * @throws RemoteException 
    */
-  public void testPerfectButter() throws UiObjectNotFoundException {
+  public void testPerfectButter() throws UiObjectNotFoundException, RemoteException {
     
     UiDevice.getInstance().pressHome();
     
     while(numTests != 0) {
       goToAboutPhone();
-      launchPerfectButter();
+      PhoneUtilities.launchApp("Perfect Butter Backup");
       romOptions();
       backup();
       restore();
       numTests--;
+      }
     }
-  }
   
   /**
    * Navigate to About Phone through the notification shade
@@ -62,40 +64,36 @@ public class UiTester extends UiAutomatorTestCase {
   }
   
   /**
-   * Launch PerfectButterBackup application
+   * Toggle through UI Options
+   * @throws RemoteException 
    */
-  private static void launchPerfectButter() throws UiObjectNotFoundException {
+  private static void romOptions() throws UiObjectNotFoundException, RemoteException {
+    PerfectButterBackupApp.selectTab("ROM OPTIONS");
+    PerfectButterBackupApp.toggleNavBar();
+    PerfectButterBackupApp.toggleCustomBootAni();
+    PerfectButterBackupApp.toggleCustomBootAni();
     
-    Log.d(TAG, "Launch PerfectButterBackup App");
-    PhoneUtilities.goToAppDrawer();
-        
-    UiScrollable appViews = new UiScrollable(new UiSelector().scrollable(true));
-    appViews.setAsHorizontalList();
+    PerfectButterBackupApp.toggleBatteryStatus();
     
-    UiObject perfectButterApp = appViews.getChildByText(new UiSelector()
-    .className(android.widget.TextView.class.getName()), "Perfect Butter Backup");
-    
-    perfectButterApp.clickAndWaitForNewWindow(); 
-  }
-  
-  /**
-   * Toggle through Rom Options
-   */
-  private static void romOptions() throws UiObjectNotFoundException {
-    
+    PerfectButterBackupApp.toggleVolumeManager();
+    PerfectButterBackupApp.toggleVolumeManager();
   }
   
   /**
    * Toggle Backup Options
    */
   private static void backup() throws UiObjectNotFoundException {
-    
+    PerfectButterBackupApp.toggleBackUpToSD();
+    //PerfectButterBackupApp.toggleBackupToDropbox();
+    //PerfectButterBackupApp.toggleBackupToEmail();
   }
   
   /**
    * Toggle Restore options
    */
   private static void restore() throws UiObjectNotFoundException {
-    
+    PerfectButterBackupApp.toggleRestoreFromSD();
+    //PerfectButterBackupApp.toggleRestoreFromDropbox();
+    //PerfectButterBackupApp.toggleRestoreFromEmail();
   }
 }

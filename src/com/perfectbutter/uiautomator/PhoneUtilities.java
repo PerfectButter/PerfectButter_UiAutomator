@@ -1,6 +1,9 @@
 package com.perfectbutter.uiautomator;
 
+import android.graphics.Rect;
+import android.os.RemoteException;
 import android.util.Log;
+import android.widget.FrameLayout;
 
 import com.android.uiautomator.core.UiDevice;
 import com.android.uiautomator.core.UiObject;
@@ -20,7 +23,7 @@ import com.android.uiautomator.core.UiSelector;
  */
 public class PhoneUtilities {
   
-  private static final String TAG = "PhoneUtilies";
+  private static final String TAG = "Perfect Butter Ui Automator";
   
   /**
    * Method to open notification shade with swiping motion
@@ -52,6 +55,8 @@ public class PhoneUtilities {
    */
   public static void goToAppDrawer() throws UiObjectNotFoundException {
     Log.d(TAG, "Launching App Drawer");
+    UiDevice.getInstance().pressHome();
+    
     UiObject appDrawer = new UiObject(new UiSelector().description("Apps"));
     appDrawer.click();
   }
@@ -94,6 +99,61 @@ public class PhoneUtilities {
     openNotificationShade();
     goToSettings();
     goToAppsInSettings(nameOfApp);
+    
+  }
+  
+  public static void waitforRestart() throws UiObjectNotFoundException {
+    Log.d(TAG, "Delay 35 seconds for phone to reboot");
+    delay(35);
+  }
+  
+  public static void unlockPhone() throws UiObjectNotFoundException {
+    if(!doesLockScreenExist()) {
+      delay(10);
+    }
+    
+    UiObject slideArea = new UiObject(
+        new UiSelector().description("Slide area."));
+    Rect slideAreaBounds = slideArea.getBounds();
+    int fromX = slideAreaBounds.centerX();
+    int fromY = slideAreaBounds.centerY();
+    int toX = slideAreaBounds.right;
+    int toY = fromY;
+    UiDevice.getInstance().swipe(fromX, fromY, toX, toY, 5);
+  }
+  
+  private static boolean doesLockScreenExist() throws UiObjectNotFoundException {
+    UiObject slideArea = new UiObject(
+        new UiSelector().description("Slide area."));
+    return slideArea.exists();
+  }
+  
+  /**
+   * Launch App
+   * @param appName name of App to launch
+   * @throws UiObjectNotFoundException
+   */
+  public static void launchApp(String appName) throws UiObjectNotFoundException {
+    
+    Log.d(TAG, "Launch PerfectButterBackup App");
+    PhoneUtilities.goToAppDrawer();
+        
+    UiScrollable appViews = new UiScrollable(new UiSelector().scrollable(true));
+    appViews.setAsHorizontalList();
+    
+    UiObject theApp = appViews.getChildByText(new UiSelector()
+    .className(android.widget.TextView.class.getName()), appName);
+    
+    theApp.clickAndWaitForNewWindow(); 
+  }
+  
+  public static void restorePerfectButter() throws UiObjectNotFoundException, RemoteException {
+    UiDevice.getInstance().pressRecentApps();
+    
+    UiObject perfectButterApp = new UiObject(new UiSelector().description("Perfect Butter Backup").
+        className(FrameLayout.class));
+    
+    perfectButterApp.clickAndWaitForNewWindow();
     
   }
 }
