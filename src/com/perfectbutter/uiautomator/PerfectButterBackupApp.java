@@ -2,12 +2,18 @@ package com.perfectbutter.uiautomator;
 
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
 
 import com.android.uiautomator.core.UiDevice;
 import com.android.uiautomator.core.UiObject;
 import com.android.uiautomator.core.UiObjectNotFoundException;
 import com.android.uiautomator.core.UiScrollable;
 import com.android.uiautomator.core.UiSelector;
+import junit.framework.Assert;
 
 /**
  * The PerfectButterBackupApp will handle all the events that can be
@@ -176,7 +182,7 @@ public class PerfectButterBackupApp {
     runBackup();
   }
   
-  public static void toggleBackupToDropbox() throws UiObjectNotFoundException {
+  public static void toggleBackupToDropbox() throws UiObjectNotFoundException, RemoteException {
     selectTab("BACKUP");
     toggleBackupItems();
     
@@ -185,9 +191,38 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Running Backup to Dropbox");
     runBackup();
+    
+    Log.d(TAG, "Dropbox Will Prompt where to upload. Click Upload for Default Folder");
+    UiObject dropboxUploadButton = new UiObject(new UiSelector().text("Upload")
+        .className(android.widget.Button.class));
+    dropboxUploadButton.clickAndWaitForNewWindow();
+    
+    Log.d(TAG, "File may already exist in Folder. Will Click Replace to overwrite current file");
+    UiObject fileAlreadyExists = new UiObject(new UiSelector().text("File already exists"));
+    if(fileAlreadyExists.exists()) {
+      UiObject replaceButton = new UiObject(new UiSelector().text("Replace")
+      .className(android.widget.Button.class));
+      replaceButton.clickAndWaitForNewWindow();
+    }
+    Log.d(TAG, "Open Notification Shade to view file being uploaded");
+    
+    PhoneUtilities.openNotificationShade();
+    
+    UiObject dropboxUploading = new UiObject(new UiSelector().text("Uploading to Dropbox").
+        className(android.widget.TextView.class));
+    
+    Assert.assertTrue(dropboxUploading.exists());
+    
+    Log.d(TAG, "Going into Dropbox to verify the File exists");
+    dropboxUploading.clickAndWaitForNewWindow();
+    
+    Assert.assertTrue("Not In Dropbox", Dropbox.isInDropbox());
+    Assert.assertTrue("Fie does not exist, Maybe an upload error", Dropbox.doesFileExist());
+    
+    PhoneUtilities.restorePerfectButter();
   }
   
-  public static void toggleBackupToEmail() throws UiObjectNotFoundException {
+  public static void toggleBackupToEmail() throws UiObjectNotFoundException, RemoteException {
     selectTab("BACKUP");
     toggleBackupItems();
     
@@ -196,13 +231,32 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Running Backup to Email");
     runBackup();
+    PhoneUtilities.delay(2);
+    
+    Log.d(TAG, "Select Gmail as email app");
+    UiObject selectGmail = new UiObject(new UiSelector().text("Gmail")
+        .className(android.widget.TextView.class));
+    selectGmail.clickAndWaitForNewWindow();
+    
+    Log.d(TAG, "Verify in Gmail App");
+    Assert.assertTrue(Gmail.isInGmail());
+    
+    Log.d(TAG, "Entering perfectbutterbackup@gmail.com for email address");
+    Gmail.enterEmailAddress("perfectbutterbackup@gmail.com");
+    
+    Assert.assertTrue("File was not attached", Gmail.isFileAttached());
+    
+    Log.d(TAG, "Sending email with PerfectButterBackup.tar");
+    Gmail.submitEmail();
+    
+    Log.d(TAG, "Restoring Perfect Butter Backup app");
+    PhoneUtilities.restorePerfectButter();
   }
   
   public static void toggleRestoreFromSD() throws UiObjectNotFoundException {
     selectTab("RESTORE");
     toggleRestoreItems();
     
-    //UiObject 
   }
   
   public static void toggleRestoreFromDropbox() throws UiObjectNotFoundException {
@@ -221,7 +275,7 @@ public class PerfectButterBackupApp {
     screenViews.setAsHorizontalList();
     
     UiObject theScreen = screenViews.getChildByText(new UiSelector()
-    .className(android.widget.TextView.class.getName()), screenName);
+    .className(TextView.class), screenName);
     Log.d(TAG, "Which Screen: " + theScreen);
     
     theScreen.click();
@@ -248,17 +302,6 @@ public class PerfectButterBackupApp {
     UiObject checkBox = new UiObject(new UiSelector().text(theOption)
         .className(android.widget.CheckBox.class));
     checkBox.click();
-  }
-  
-  private static void restartDevice() throws UiObjectNotFoundException {
-    UiObject restartButton = new UiObject(new UiSelector().text("Restart Device")
-        .className(android.widget.Button.class));
-    restartButton.click();
-    
-    Log.d(TAG, "Prompt to confirm Reboot");
-    UiObject confirmReboot = new UiObject(new UiSelector().text("Yes")
-        .className(android.widget.Button.class));
-    confirmReboot.click();
   }
   
   private static void runBackup() throws UiObjectNotFoundException {

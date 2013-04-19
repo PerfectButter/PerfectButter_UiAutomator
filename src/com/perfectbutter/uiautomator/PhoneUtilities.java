@@ -28,7 +28,7 @@ public class PhoneUtilities {
   /**
    * Method to open notification shade with swiping motion
    */
-  private static void openNotificationShade() {
+  public static void openNotificationShade() {
     int deviceWidth = UiDevice.getInstance().getDisplayWidth();
     int deviceHeight = UiDevice.getInstance().getDisplayHeight();
     

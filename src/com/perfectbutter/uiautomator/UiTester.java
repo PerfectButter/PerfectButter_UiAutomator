@@ -25,15 +25,26 @@ public class UiTester extends UiAutomatorTestCase {
     UiDevice.getInstance().pressHome();
     
     while(numTests != 0) {
-      goToAboutPhone();
-      PhoneUtilities.launchApp("Perfect Butter Backup");
-      romOptions();
-      backup();
-      restore();
+      //goToAboutPhone();
+      startPerfectButterTest();
+      //startCutTheRopeTest();
       numTests--;
       }
     }
   
+  private void startPerfectButterTest() throws UiObjectNotFoundException, RemoteException {
+    PhoneUtilities.launchApp("Perfect Butter Backup");
+    romOptions();
+    //backup();
+    //restore();
+  }
+  
+  private static void startCutTheRopeTest() throws UiObjectNotFoundException {
+    PhoneUtilities.launchApp("Cut the Rope Time Travel");
+    PhoneUtilities.delay(7); //allow game to load
+    
+  }
+
   /**
    * Navigate to About Phone through the notification shade
    * @throws UiObjectNotFoundException
@@ -68,24 +79,25 @@ public class UiTester extends UiAutomatorTestCase {
    * @throws RemoteException 
    */
   private static void romOptions() throws UiObjectNotFoundException, RemoteException {
-    PerfectButterBackupApp.selectTab("ROM OPTIONS");
-    PerfectButterBackupApp.toggleNavBar();
-    PerfectButterBackupApp.toggleCustomBootAni();
-    PerfectButterBackupApp.toggleCustomBootAni();
+    //PerfectButterBackupApp.selectTab("ROM OPTIONS");
+    //PerfectButterBackupApp.toggleNavBar();
+    //PerfectButterBackupApp.toggleCustomBootAni();
+    //PerfectButterBackupApp.toggleCustomBootAni();
     
     PerfectButterBackupApp.toggleBatteryStatus();
     
-    PerfectButterBackupApp.toggleVolumeManager();
-    PerfectButterBackupApp.toggleVolumeManager();
+    //PerfectButterBackupApp.toggleVolumeManager();
+    //PerfectButterBackupApp.toggleVolumeManager();
   }
   
   /**
    * Toggle Backup Options
+   * @throws RemoteException 
    */
-  private static void backup() throws UiObjectNotFoundException {
-    PerfectButterBackupApp.toggleBackUpToSD();
+  private static void backup() throws UiObjectNotFoundException, RemoteException {
+    //PerfectButterBackupApp.toggleBackUpToSD();
     //PerfectButterBackupApp.toggleBackupToDropbox();
-    //PerfectButterBackupApp.toggleBackupToEmail();
+    PerfectButterBackupApp.toggleBackupToEmail();
   }
   
   /**
@@ -97,3 +109,4 @@ public class UiTester extends UiAutomatorTestCase {
     //PerfectButterBackupApp.toggleRestoreFromEmail();
   }
 }
+  
