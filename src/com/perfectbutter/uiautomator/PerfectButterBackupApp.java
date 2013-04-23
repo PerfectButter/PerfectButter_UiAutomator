@@ -180,17 +180,18 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Running Backup to SD Card");
     runBackup();
+    PhoneUtilities.delay(10);
   }
   
   public static void toggleBackupToDropbox() throws UiObjectNotFoundException, RemoteException {
     selectTab("BACKUP");
-    toggleBackupItems();
     
     UiObject dropboxRadio = new UiObject(new UiSelector().text("Dropbox"));
     dropboxRadio.click();
     
     Log.d(TAG, "Running Backup to Dropbox");
     runBackup();
+    PhoneUtilities.delay(2);
     
     Log.d(TAG, "Dropbox Will Prompt where to upload. Click Upload for Default Folder");
     UiObject dropboxUploadButton = new UiObject(new UiSelector().text("Upload")
@@ -224,7 +225,6 @@ public class PerfectButterBackupApp {
   
   public static void toggleBackupToEmail() throws UiObjectNotFoundException, RemoteException {
     selectTab("BACKUP");
-    toggleBackupItems();
     
     UiObject emailRadio = new UiObject(new UiSelector().text("Email"));
     emailRadio.click();
@@ -257,14 +257,38 @@ public class PerfectButterBackupApp {
     selectTab("RESTORE");
     toggleRestoreItems();
     
+    runRestore();
+    PhoneUtilities.delay(5);
   }
   
   public static void toggleRestoreFromDropbox() throws UiObjectNotFoundException {
+    selectTab("RESTORE");
     
+    runRestore();
+    
+    UiObject selectDropbox = new UiObject(new UiSelector().text("Dropbox")
+        .className(TextView.class));
+    selectDropbox.clickAndWaitForNewWindow();
+    
+    UiObject restoreFile = new UiObject(new UiSelector().text("perfectButterBackup.tar")
+        .className(TextView.class));
+    restoreFile.clickAndWaitForNewWindow();
+    PhoneUtilities.delay(5);
   }
   
   public static void toggleRestoreFromEmail() throws UiObjectNotFoundException {
+    UiObject emailRadio = new UiObject(new UiSelector().text("Email"));
+    emailRadio.click();
     
+    runRestore();
+    PhoneUtilities.delay(2);
+    
+    UiScrollable fileView = new UiScrollable(new UiSelector().scrollable(true));
+    
+    UiObject restoreFile = fileView.getChildByText(new UiSelector()
+    .className(android.widget.TextView.class.getName()), "perfectButterBackup.tar");
+    
+    restoreFile.clickAndWaitForNewWindow(); 
   }
   
   private static void swipeToScreen(String screenName) throws UiObjectNotFoundException {
@@ -307,7 +331,13 @@ public class PerfectButterBackupApp {
   private static void runBackup() throws UiObjectNotFoundException {
     UiObject backupButton = new UiObject(new UiSelector().text("Run Backup!")
         .className(android.widget.Button.class));
-    backupButton.click();
+    backupButton.clickAndWaitForNewWindow();
+  }
+  
+  private static void runRestore() throws UiObjectNotFoundException {
+    UiObject restoreButton = new UiObject(new UiSelector().text("Run restore")
+        .className(android.widget.Button.class));
+    restoreButton.clickAndWaitForNewWindow();
   }
 
 }
