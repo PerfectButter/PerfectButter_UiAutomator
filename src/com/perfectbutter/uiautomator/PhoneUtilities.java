@@ -100,6 +100,20 @@ public class PhoneUtilities {
     goToSettings();
     goToAppsInSettings(nameOfApp);
     
+    UiObject clearData = new UiObject(new UiSelector().text("Clear data"));
+    UiObject appTitle = new UiObject(new UiSelector().text(nameOfApp));
+    
+    Log.d(TAG, "Checking if Clear Data button is enabled");
+    if (clearData.isEnabled() && appTitle.exists()) {
+      Log.d(TAG, "Clearing App Data");
+      clearData.clickAndWaitForNewWindow();
+      UiObject okButton = new UiObject(new UiSelector().text("OK"));
+      okButton.click();
+      UiDevice.getInstance().pressHome();
+    } else {
+      Log.d(TAG, "Clear Data Button is not enabled. Pressing Home Button");
+      UiDevice.getInstance().pressHome();
+    }
   }
   
   public static void waitforRestart() throws UiObjectNotFoundException {

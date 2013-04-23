@@ -13,6 +13,8 @@ import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 public class UiTester extends UiAutomatorTestCase {
   
   private static final String TAG = "Perfect Butter Ui Automator";
+  private static final String PERFECT_BUTTER_BACKUP = "Perfect Butter Backup";
+  private static final String CUT_THE_ROPE = "Cut the Rope Time Travel";
   private int numTests = 100;
   
   /**
@@ -33,16 +35,24 @@ public class UiTester extends UiAutomatorTestCase {
     }
   
   private void startPerfectButterTest() throws UiObjectNotFoundException, RemoteException {
-    PhoneUtilities.launchApp("Perfect Butter Backup");
+    PhoneUtilities.launchApp("PERFECT_BUTTER_BACKUP");
     romOptions();
     //backup();
     //restore();
   }
   
   private static void startCutTheRopeTest() throws UiObjectNotFoundException {
-    PhoneUtilities.launchApp("Cut the Rope Time Travel");
+    PhoneUtilities.launchApp(CUT_THE_ROPE);
     PhoneUtilities.delay(7); //allow game to load
     
+    CutTheRope.goIntoGame();
+    
+    PhoneUtilities.clearAppData(CUT_THE_ROPE);
+    
+    PhoneUtilities.launchApp(CUT_THE_ROPE);
+    PhoneUtilities.delay(7);
+    
+    CutTheRope.goIntoGame();
   }
 
   /**
