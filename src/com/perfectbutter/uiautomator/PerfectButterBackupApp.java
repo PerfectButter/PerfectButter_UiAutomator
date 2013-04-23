@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 
@@ -51,7 +52,7 @@ public class PerfectButterBackupApp {
       Log.d(TAG, "Turn Volume Up");
       UiDevice.getInstance().pressKeyCode(24);
       PhoneUtilities.delay(1);
-      Log.d(TAG, "");
+      Log.d(TAG, "Click the Extender Button to extend volume options");
       UiDevice.getInstance().click(642,312);
       PhoneUtilities.delay(1);
       
@@ -73,10 +74,11 @@ public class PerfectButterBackupApp {
     } else {
       Log.d(TAG, "Volume Mod not enabled. Only main Phone Volume Shown");
       UiDevice.getInstance().pressKeyCode(24);
+      PhoneUtilities.delay(1);
       
       Log.d(TAG, "Toggle the Phone Volume up & down");
-      UiDevice.getInstance().swipe(525, 300, 175, 300, 10);
-      UiDevice.getInstance().swipe(175,  300, 525, 300, 10);
+      UiDevice.getInstance().swipe(525, 300, 175, 300, 25);
+      UiDevice.getInstance().swipe(175,  300, 525, 300, 25);
     }
   }
   
@@ -208,6 +210,7 @@ public class PerfectButterBackupApp {
     Log.d(TAG, "Open Notification Shade to view file being uploaded");
     
     PhoneUtilities.openNotificationShade();
+    PhoneUtilities.delay(1);
     
     UiObject dropboxUploading = new UiObject(new UiSelector().text("Uploading to Dropbox").
         className(android.widget.TextView.class));
@@ -219,6 +222,7 @@ public class PerfectButterBackupApp {
     
     Assert.assertTrue("Not In Dropbox", Dropbox.isInDropbox());
     Assert.assertTrue("Fie does not exist, Maybe an upload error", Dropbox.doesFileExist());
+    PhoneUtilities.delay(5);
     
     PhoneUtilities.restorePerfectButter();
   }
@@ -241,6 +245,9 @@ public class PerfectButterBackupApp {
     Log.d(TAG, "Verify in Gmail App");
     Assert.assertTrue(Gmail.isInGmail());
     
+    Log.d(TAG, "Clearing email address if any exists");
+    Gmail.clearEmailAddress();
+    
     Log.d(TAG, "Entering perfectbutterbackup@gmail.com for email address");
     Gmail.enterEmailAddress("perfectbutterbackup@gmail.com");
     
@@ -255,14 +262,18 @@ public class PerfectButterBackupApp {
   
   public static void toggleRestoreFromSD() throws UiObjectNotFoundException {
     selectTab("RESTORE");
+    
     toggleRestoreItems();
     
+    selectSDCardRadio().click();
+    
     runRestore();
-    PhoneUtilities.delay(5);
   }
   
   public static void toggleRestoreFromDropbox() throws UiObjectNotFoundException {
     selectTab("RESTORE");
+    
+    selectDropboxRadio().click();
     
     runRestore();
     
@@ -277,11 +288,11 @@ public class PerfectButterBackupApp {
   }
   
   public static void toggleRestoreFromEmail() throws UiObjectNotFoundException {
-    UiObject emailRadio = new UiObject(new UiSelector().text("Email"));
-    emailRadio.click();
+    selectTab("RESTORE");
+    
+    selectEmailRadio().click();
     
     runRestore();
-    PhoneUtilities.delay(2);
     
     UiScrollable fileView = new UiScrollable(new UiSelector().scrollable(true));
     
@@ -338,6 +349,46 @@ public class PerfectButterBackupApp {
     UiObject restoreButton = new UiObject(new UiSelector().text("Run restore")
         .className(android.widget.Button.class));
     restoreButton.clickAndWaitForNewWindow();
+    
+    UiObject restoreText = new UiObject(new UiSelector().text("Restore in progress")
+        .className(TextView.class));
+    
+    while(restoreText.exists()) {
+      Log.d(TAG, "Still restoring. Need to wait until finished");
+      PhoneUtilities.delay(1);
+    }
   }
-
+  
+  /**
+   * Get the Dropbox UiObject RadioButton
+   * @return the Dropbox UiObject
+   * @throws UiObjectNotFoundException
+   */
+  private static UiObject selectDropboxRadio() throws UiObjectNotFoundException {
+    UiObject dropboxRadio = new UiObject(new UiSelector().text("Dropbox")
+        .className(RadioButton.class));
+    return dropboxRadio;
+  }
+  
+  /**
+   * Get the SD Card UiObject RadioButton
+   * @return the SD Card UiObject
+   * @throws UiObjectNotFoundException
+   */
+  private static UiObject selectSDCardRadio() throws UiObjectNotFoundException {
+    UiObject sdcardRadio = new UiObject(new UiSelector().text("SD Card")
+        .className(RadioButton.class));
+    return sdcardRadio;
+  }
+  
+  /**
+   * Get the Email UiObject RadioButton
+   * @return the Email UiObject
+   * @throws UiObjectNotFoundException
+   */
+  private static UiObject selectEmailRadio() throws UiObjectNotFoundException {
+    UiObject emailRadio = new UiObject(new UiSelector().text("Email")
+        .className(RadioButton.class));
+    return emailRadio;
+  }
 }

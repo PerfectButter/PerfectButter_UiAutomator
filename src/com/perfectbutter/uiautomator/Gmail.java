@@ -36,5 +36,11 @@ public class Gmail {
   public static void checkEmailFromNotification() throws UiObjectNotFoundException {
     
   }
+  
+  public static void clearEmailAddress() throws UiObjectNotFoundException {
+    UiObject theEmail = new UiObject(new UiSelector().description("To")
+        .className(android.widget.MultiAutoCompleteTextView.class));
+    theEmail.clearTextField();
+  }
 
 }

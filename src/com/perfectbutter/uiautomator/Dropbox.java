@@ -17,6 +17,4 @@ public class Dropbox {
         .className(android.widget.TextView.class));
     return backupFile.exists();
   }
-  
-
 }
