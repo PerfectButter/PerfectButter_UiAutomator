@@ -14,7 +14,7 @@ public class UiTester extends UiAutomatorTestCase {
   
   private static final String TAG = "Perfect Butter Ui Automator";
   private static final String PERFECT_BUTTER_BACKUP = "Perfect Butter Backup";
-  private static final String CUT_THE_ROPE = "Cut the Rope Time Travel";
+  private static final String WATER = "Water?";
   private int numTests = 100;
   
   /**
@@ -26,33 +26,43 @@ public class UiTester extends UiAutomatorTestCase {
     
     UiDevice.getInstance().pressHome();
     
-    while(numTests != 0) {
-      //goToAboutPhone();
+    //while(numTests != 0) {
+      goToAboutPhone();
       startPerfectButterTest();
-      //startCutTheRopeTest();
-      numTests--;
-      }
+      startWaterTest();
+      //numTests--;
+      //}
     }
   
   private void startPerfectButterTest() throws UiObjectNotFoundException, RemoteException {
-    PhoneUtilities.launchApp("PERFECT_BUTTER_BACKUP");
+    PhoneUtilities.launchApp(PERFECT_BUTTER_BACKUP);
     romOptions();
-    //backup();
-    //restore();
+    backup();
+    restore();
   }
   
-  private static void startCutTheRopeTest() throws UiObjectNotFoundException {
-    PhoneUtilities.launchApp(CUT_THE_ROPE);
-    PhoneUtilities.delay(7); //allow game to load
+  private static void startWaterTest() throws UiObjectNotFoundException, RemoteException {
+    PhoneUtilities.launchApp(WATER);
+    PhoneUtilities.delay(12); //allow game to load
     
-    CutTheRope.goIntoGame();
+    Water.goIntoGame();
     
-    PhoneUtilities.clearAppData(CUT_THE_ROPE);
+    PhoneUtilities.clearAppData(WATER);
     
-    PhoneUtilities.launchApp(CUT_THE_ROPE);
-    PhoneUtilities.delay(7);
+    PhoneUtilities.launchApp(WATER);
+    PhoneUtilities.delay(12);
     
-    CutTheRope.goIntoGame();
+    Water.goIntoGameAfterReset();
+    
+    PhoneUtilities.closeFromRecents(WATER);
+    
+    PhoneUtilities.launchApp(PERFECT_BUTTER_BACKUP);
+    PerfectButterBackupApp.toggleRestoreFromSD();
+    
+    PhoneUtilities.launchApp(WATER);
+    PhoneUtilities.delay(12); //allow game to load
+    
+    Water.goIntoGame();
   }
 
   /**
@@ -89,15 +99,17 @@ public class UiTester extends UiAutomatorTestCase {
    * @throws RemoteException 
    */
   private static void romOptions() throws UiObjectNotFoundException, RemoteException {
-    //PerfectButterBackupApp.selectTab("ROM OPTIONS");
-    //PerfectButterBackupApp.toggleNavBar();
-    //PerfectButterBackupApp.toggleCustomBootAni();
-    //PerfectButterBackupApp.toggleCustomBootAni();
+    PerfectButterBackupApp.selectTab("ROM OPTIONS");
+    PerfectButterBackupApp.toggleNavBar();
+    PerfectButterBackupApp.toggleCustomBootAni();
+    PerfectButterBackupApp.toggleCustomBootAni();
     
     PerfectButterBackupApp.toggleBatteryStatus();
     
-    //PerfectButterBackupApp.toggleVolumeManager();
-    //PerfectButterBackupApp.toggleVolumeManager();
+    PerfectButterBackupApp.toggleVolumeManager();
+    PhoneUtilities.delay(4);
+    PerfectButterBackupApp.toggleVolumeManager();
+    PhoneUtilities.delay(2);
   }
   
   /**
@@ -105,18 +117,18 @@ public class UiTester extends UiAutomatorTestCase {
    * @throws RemoteException 
    */
   private static void backup() throws UiObjectNotFoundException, RemoteException {
-    //PerfectButterBackupApp.toggleBackUpToSD();
-    //PerfectButterBackupApp.toggleBackupToDropbox();
+    PerfectButterBackupApp.toggleBackupToDropbox();
     PerfectButterBackupApp.toggleBackupToEmail();
+    PerfectButterBackupApp.toggleBackUpToSD();
   }
   
   /**
    * Toggle Restore options
    */
   private static void restore() throws UiObjectNotFoundException {
+    PerfectButterBackupApp.toggleRestoreFromDropbox();
+    PerfectButterBackupApp.toggleRestoreFromEmail();
     PerfectButterBackupApp.toggleRestoreFromSD();
-    //PerfectButterBackupApp.toggleRestoreFromDropbox();
-    //PerfectButterBackupApp.toggleRestoreFromEmail();
   }
 }
   

@@ -76,17 +76,20 @@ public class PhoneUtilities {
   }
   
   private static void goToAppsInSettings(String nameOfApp) throws UiObjectNotFoundException {
+    Log.d(TAG, "Going into App Menu in Settings");
     UiScrollable settingsViews = new UiScrollable(new UiSelector().scrollable(true));
     UiObject settingsApps = settingsViews.getChildByText(new UiSelector()
     .className(android.widget.TextView.class.getName()), "Apps");
     
     settingsApps.clickAndWaitForNewWindow();
     
+    Log.d(TAG, "Looking for " + nameOfApp);
     UiScrollable appsViews = new UiScrollable(new UiSelector().scrollable(true));
     
     UiObject theApp = appsViews.getChildByText(new UiSelector()
     .className(android.widget.TextView.class.getName()), nameOfApp);
     
+    Log.d(TAG, nameOfApp + "Found. Going into Details");
     theApp.clickAndWaitForNewWindow(); 
   }
   
@@ -96,7 +99,9 @@ public class PhoneUtilities {
    * @throws UiObjectNotFoundException
    */
   public static void clearAppData(String nameOfApp) throws UiObjectNotFoundException {
+    Log.d(TAG, "Clearing App Data for " + nameOfApp);
     openNotificationShade();
+    Log.d(TAG, "Click On Settings");
     goToSettings();
     goToAppsInSettings(nameOfApp);
     
@@ -116,32 +121,6 @@ public class PhoneUtilities {
     }
   }
   
-  public static void waitforRestart() throws UiObjectNotFoundException {
-    Log.d(TAG, "Delay 35 seconds for phone to reboot");
-    delay(35);
-  }
-  
-  public static void unlockPhone() throws UiObjectNotFoundException {
-    if(!doesLockScreenExist()) {
-      delay(10);
-    }
-    
-    UiObject slideArea = new UiObject(
-        new UiSelector().description("Slide area."));
-    Rect slideAreaBounds = slideArea.getBounds();
-    int fromX = slideAreaBounds.centerX();
-    int fromY = slideAreaBounds.centerY();
-    int toX = slideAreaBounds.right;
-    int toY = fromY;
-    UiDevice.getInstance().swipe(fromX, fromY, toX, toY, 5);
-  }
-  
-  private static boolean doesLockScreenExist() throws UiObjectNotFoundException {
-    UiObject slideArea = new UiObject(
-        new UiSelector().description("Slide area."));
-    return slideArea.exists();
-  }
-  
   /**
    * Launch App
    * @param appName name of App to launch
@@ -149,7 +128,7 @@ public class PhoneUtilities {
    */
   public static void launchApp(String appName) throws UiObjectNotFoundException {
     
-    Log.d(TAG, "Launch PerfectButterBackup App");
+    Log.d(TAG, "Launch " + appName + " App");
     PhoneUtilities.goToAppDrawer();
         
     UiScrollable appViews = new UiScrollable(new UiSelector().scrollable(true));
@@ -169,5 +148,15 @@ public class PhoneUtilities {
     
     perfectButterApp.clickAndWaitForNewWindow();
     
+  }
+  
+  public static void closeFromRecents(String appName) throws UiObjectNotFoundException, RemoteException {
+    UiDevice.getInstance().pressRecentApps();
+    
+    UiObject theApp = new UiObject(new UiSelector().description(appName).
+        className(FrameLayout.class));
+    theApp.swipeRight(25);
+    
+    UiDevice.getInstance().pressHome();
   }
 }

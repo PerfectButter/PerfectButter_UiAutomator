@@ -6,6 +6,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -121,15 +122,15 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Changing Navigation Bar to Small");
     navBarSmall.click();
-    PhoneUtilities.delay(5);
+    PhoneUtilities.delay(3);
     
     Log.d(TAG, "Changing Navigation Bar to Medium");
     navBarMedium.click();
-    PhoneUtilities.delay(5);
+    PhoneUtilities.delay(3);
     
     Log.d(TAG, "Changing Navigation Bar to Large");
     navBarLarge.click();
-    PhoneUtilities.delay(5);
+    PhoneUtilities.delay(3);
   }
   
   private static void toggleBackupItems() throws UiObjectNotFoundException {
@@ -182,7 +183,8 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Running Backup to SD Card");
     runBackup();
-    PhoneUtilities.delay(10);
+    
+    waitForBackupToFinish();
   }
   
   public static void toggleBackupToDropbox() throws UiObjectNotFoundException, RemoteException {
@@ -193,6 +195,8 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Running Backup to Dropbox");
     runBackup();
+    
+    waitForBackupToFinish();
     PhoneUtilities.delay(2);
     
     Log.d(TAG, "Dropbox Will Prompt where to upload. Click Upload for Default Folder");
@@ -225,6 +229,8 @@ public class PerfectButterBackupApp {
     PhoneUtilities.delay(5);
     
     PhoneUtilities.restorePerfectButter();
+    
+    waitForBackupToFinish();
   }
   
   public static void toggleBackupToEmail() throws UiObjectNotFoundException, RemoteException {
@@ -235,6 +241,8 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Running Backup to Email");
     runBackup();
+    
+    waitForBackupToFinish();
     PhoneUtilities.delay(2);
     
     Log.d(TAG, "Select Gmail as email app");
@@ -258,20 +266,24 @@ public class PerfectButterBackupApp {
     
     Log.d(TAG, "Restoring Perfect Butter Backup app");
     PhoneUtilities.restorePerfectButter();
+    
+    waitForBackupToFinish();
   }
   
   public static void toggleRestoreFromSD() throws UiObjectNotFoundException {
     selectTab("RESTORE");
     
-    toggleRestoreItems();
-    
     selectSDCardRadio().click();
     
     runRestore();
+    
+    waitForRestoreToFinish();
   }
   
   public static void toggleRestoreFromDropbox() throws UiObjectNotFoundException {
     selectTab("RESTORE");
+    
+    toggleRestoreItems();
     
     selectDropboxRadio().click();
     
@@ -284,22 +296,48 @@ public class PerfectButterBackupApp {
     UiObject restoreFile = new UiObject(new UiSelector().text("perfectButterBackup.tar")
         .className(TextView.class));
     restoreFile.clickAndWaitForNewWindow();
-    PhoneUtilities.delay(5);
+    
+    waitForDropboxDownloadToFinish();
+   PhoneUtilities.delay(1);
   }
   
   public static void toggleRestoreFromEmail() throws UiObjectNotFoundException {
-    selectTab("RESTORE");
+    Log.d(TAG, "Restoring From Email Option");
     
     selectEmailRadio().click();
     
     runRestore();
     
-    UiScrollable fileView = new UiScrollable(new UiSelector().scrollable(true));
+    Log.d(TAG, "Looking for perfectButterBackup.tar in File Manager");
+    //UiScrollable fileView = new UiScrollable(new UiSelector().className(RelativeLayout.class));
+    UiScrollable fileView = new UiScrollable(new UiSelector().className(RelativeLayout.class));
+    fileView.scrollToBeginning(1);
     
-    UiObject restoreFile = fileView.getChildByText(new UiSelector()
-    .className(android.widget.TextView.class.getName()), "perfectButterBackup.tar");
+    int maxSwipes = fileView.getMaxSearchSwipes();
     
-    restoreFile.clickAndWaitForNewWindow(); 
+    UiSelector selector;
+    selector = new UiSelector().className(TextView.class);
+    
+    UiObject restoreFile;
+    
+    // The following loop is to workaround a bug in Android 4.2.2 which
+    // fails to scroll more than once into view.
+    for (int i = 0; i < maxSwipes; i++) {
+      try {
+        restoreFile = fileView.getChildByText(selector, "perfectButterBackup.tar");
+        if (restoreFile != null) {
+          restoreFile.clickAndWaitForNewWindow();
+          break;
+          }
+        } catch (UiObjectNotFoundException e) {
+          System.out.println("Did not find match for " + e.getLocalizedMessage());
+          }
+      for (int j = 0; j < i; j++) {
+        fileView.scrollForward();
+        }
+    }
+    Log.d(TAG, "File Found and now restoring");
+    waitForRestoreToFinish();
   }
   
   private static void swipeToScreen(String screenName) throws UiObjectNotFoundException {
@@ -345,11 +383,31 @@ public class PerfectButterBackupApp {
     backupButton.clickAndWaitForNewWindow();
   }
   
+  private static void waitForBackupToFinish() throws UiObjectNotFoundException {
+    UiObject backupText = new UiObject(new UiSelector().text("Backup in progress")
+        .className(TextView.class));
+    
+    while(backupText.exists()) {
+      Log.d(TAG, "Still backup up. Need to wait until finished.");
+      PhoneUtilities.delay(1);
+    }
+  }
+  
+  /**
+   * Run the restore button
+   * @throws UiObjectNotFoundException
+   */
   private static void runRestore() throws UiObjectNotFoundException {
     UiObject restoreButton = new UiObject(new UiSelector().text("Run restore")
         .className(android.widget.Button.class));
     restoreButton.clickAndWaitForNewWindow();
-    
+  }
+  
+  /**
+   * Wait for the restore popup to finish
+   * @throws UiObjectNotFoundException
+   */
+  private static void waitForRestoreToFinish() throws UiObjectNotFoundException {
     UiObject restoreText = new UiObject(new UiSelector().text("Restore in progress")
         .className(TextView.class));
     
@@ -359,6 +417,16 @@ public class PerfectButterBackupApp {
     }
   }
   
+  private static void waitForDropboxDownloadToFinish() throws UiObjectNotFoundException {
+    UiObject dropboxDownload = new UiObject(new UiSelector().text("perfectButterBackup.tar")
+        .className(TextView.class).packageName("com.dropbox.android"));
+    
+    while(dropboxDownload.exists()) {
+      Log.d(TAG, "Waiting for Dropbox to download the backup file");
+      PhoneUtilities.delay(1);
+    }		
+  }
+ 
   /**
    * Get the Dropbox UiObject RadioButton
    * @return the Dropbox UiObject
